@@ -27,7 +27,7 @@ set(nvmemul_src
     thread.c
     topology.c
     process_rank.c
-)
+        malloc.c)
 
 include_directories(${CMAKE_SOURCE_DIR}/third_party)
 include_directories(${CMAKE_SOURCE_DIR}/src)

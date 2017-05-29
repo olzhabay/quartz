@@ -23,6 +23,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #include "monotonic_timer.h"
 #include "pflush.h"
 #include "stat.h"
+#include "malloc.h"
 
 static void init() __attribute__((constructor));
 static void finalize() __attribute__((destructor));
@@ -89,6 +90,7 @@ void init()
 
     __cconfig_lookup_bool(&cfg, "latency.enable", &latency_model.enabled);
     __cconfig_lookup_bool(&cfg, "bandwidth.enable", &read_bw_model.enabled);
+    __cconfig_lookup_bool(&cfg, "hybrid.enable", &hybrid_malloc.enabled);
 
     if (dbg_init(&cfg, -1, NULL) != E_SUCCESS) {
         goto error;
@@ -107,6 +109,11 @@ void init()
 
     if (init_bandwidth_model(&cfg, virtual_topology) != E_SUCCESS) {
         goto error;
+    }
+
+    if (hybrid_malloc.enabled) {
+        __cconfig_lookup_int(&cfg, "hybrid.percentage", &hybrid_malloc.percentage);
+        hybrid_malloc.rate = hybrid_malloc.percentage / 100;
     }
 
     if (latency_model.enabled) {
